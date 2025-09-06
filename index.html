@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dart Model Generator | JSON to Dart for Flutter</title>
+    <!-- SEO -->
+    <meta name="title" content="Dart Model Generator | JSON to Dart for Flutter">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="author" content="Rajesh Kumar Dhuriya">
+    <meta name="keywords" content="dart model generator, flutter json to dart, json to model dart, dart data class generator, flutter api model generator, dart class from json, flutter model creator, dart code generator, flutter backend integration, json serializer dart">
+    <meta name="description" content="Generate Dart and Flutter models instantly from JSON. Convert API responses into clean Dart classes with null-safety, serialization, and export options. Perfect for Flutter developers.">
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp, etc.) -->
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Dart Model Generator">
+	<meta property="og:description" content="Generate Dart and Flutter models instantly from JSON. Clean, null-safe, and ready for Flutter APIs.">
+	<meta property="og:url" content="https://username.github.io/repository-name/">
+	<meta property="og:image" content="https://username.github.io/repository-name/assets/preview.png">
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Dart Model Generator">
+	<meta name="twitter:description" content="Convert JSON into Dart and Flutter models with ease. Free online code generator.">
+	<meta name="twitter:image" content="https://username.github.io/repository-name/assets/preview.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/dracula.min.css">
+    <style>
+        :root {
+            --primary: #0175c2; /* Dart brand blue */
+            --primary-dark: #02569b;
+            --dark-bg: #1e1e1e;
+            --code-bg: #2d2d2d;
+            --border-color: #444;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--primary), #03a9f4);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(1, 117, 194, 0.3);
+        }
+        
+        .btn-copy {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .btn-copy:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(1, 117, 194, 0.25);
+        }
+        
+        .code-container {
+            position: relative;
+            background-color: var(--dark-bg);
+            overflow: auto;
+            padding: 15px;
+            height: 480px; /* Fixed height as requested */
+        }
+        
+        #outputCode {
+            background-color: var(--dark-bg);
+            color: #f8f8f2;
+            padding: 20px;
+            overflow: auto;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+            height: 100%;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .options-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .option-group {
+            margin-bottom: 12px;
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+            display: block;
+            font-size: 0.9rem;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .column-header {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .sample-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .sample-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .custom-switch .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .custom-switch .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(1, 117, 194, 0.25);
+        }
+        
+        .language-selector {
+            background: white;
+            border-radius: 6px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .language-selector select {
+            border: 1px solid #ddd;
+        }
+        
+        .main-content {
+            padding: 20px 0;
+        }
+        
+        .hljs {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem 0;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 fw-bold mb-2"><i class="bi bi-code-slash"></i> Dart Model Generator</h1>
+                    <p class="mb-0">Generate Dart models from JSON with proper syntax highlighting</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button id="sampleBtn" class="sample-btn">
+                        <i class="bi bi-lightning-fill me-1"></i>Load Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid main-content">
+        <div class="row g-3">
+            <!-- Input Column -->
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-file-earmark-code me-2"></i>JSON Input</span>
+                        <button id="clearBtn" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-x me-1"></i>Clear Input
+                        </button>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-3 flex-grow-1">
+                            <textarea id="jsonInput" class="form-control" rows="18" placeholder='{"name": "John", "age": 30, "address": {"city": "New York", "zip": "10001"}}'></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="topLevelName" class="form-label">Class Name:</label>
+                            <input type="text" id="topLevelName" class="form-control" value="LoginResponse" placeholder="Enter class name">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Options Column -->
+            <div class="col-lg-2">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-sliders2 me-2"></i>Options</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="options-section">
+                            <div class="option-group">
+                                <label class="option-label">Naming Convention</label>
+                                <select id="namingConvention" class="form-select">
+                                    <option value="camel">Camel Case</option>
+                                    <option value="pascal">Pascal Case</option>
+                                    <option value="snake">Snake Case</option>
+                                </select>
+                            </div>
+                            
+                            <div class="option-group">
+                                <label class="option-label">Null Safety</label>
+                                <div class="form-check custom-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="nullSafety" checked>
+                                    <label class="form-check-label" for="nullSafety">Null Safety</label>
+                                </div>
+                            </div>
+                            
+                            <div class="option-group">
+                                <label class="option-label">Code Style</label>
+                                <div class="form-check custom-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="equatable" checked>
+                                    <label class="form-check-label" for="equatable">Equatable Support</label>
+                                </div>
+                                <div class="form-check custom-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="jsonSerializable" checked>
+                                    <label class="form-check-label" for="jsonSerializable">JSON Serializable</label>
+                                </div>
+                            </div>
+                            
+                            <div class="option-group">
+                                <label class="option-label">Advanced</label>
+                                <div class="form-check custom-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="finalFields" checked>
+                                    <label class="form-check-label" for="finalFields">Final Fields</label>
+                                </div>
+                                <div class="form-check custom-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="copyWith" checked>
+                                    <label class="form-check-label" for="copyWith">CopyWith Method</label>
+                                </div>
+                            </div>
+                            
+                            <button id="generateBtn" class="btn btn-primary w-100 mt-2">
+                                <i class="bi bi-gear-fill me-2"></i>Generate Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Output Column -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-file-richtext me-2"></i>Generated Dart Code</span>
+                        <div class="btn-group ms-auto" role="group" aria-label="Basic example">
+                            <button id="copyBtn" class="btn btn-sm btn-outline-light me-1">
+                                <i class="bi bi-clipboard me-1"></i>Copy Code
+                            </button>
+                            <button id="btnDownload" class="btn btn-sm btn-outline-light">
+                                <i class="bi bi-download me-1"></i>Download Model
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="code-container flex-grow-1">
+                            <pre><code id="outputCode" class="language-dart">// Your generated Dart code will appear here...</code></pre>
+                            <button id="copyBtnTop" class="btn btn-sm btn-copy">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" id="toast" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>Code copied to clipboard!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/dart.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize highlight.js
+            hljs.highlightAll();
+            
+            // DOM Elements
+            const jsonInput = document.getElementById('jsonInput');
+            const topLevelName = document.getElementById('topLevelName');
+            const generateBtn = document.getElementById('generateBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const btnDownload = document.getElementById('btnDownload');
+            const copyBtnTop = document.getElementById('copyBtnTop');
+            const outputCode = document.getElementById('outputCode');
+            const sampleBtn = document.getElementById('sampleBtn');
+            const toastEl = document.getElementById('toast');
+            const toast = new bootstrap.Toast(toastEl);
+            
+            // Options
+            const namingConvention = document.getElementById('namingConvention');
+            const nullSafety = document.getElementById('nullSafety');
+            const equatable = document.getElementById('equatable');
+            const jsonSerializable = document.getElementById('jsonSerializable');
+            const finalFields = document.getElementById('finalFields');
+            const copyWith = document.getElementById('copyWith');
+            
+            // Sample JSON data
+            const sampleData = {
+                "status": true,
+                "user": {
+                    "id": 1,
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "phone": "123-456-7890",
+                    "avatar": "https://example.com/avatar.jpg",
+                    "department": null,
+                    "subject": null
+                },
+                "authorization": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+                    "type": "Bearer",
+                    "expires_in": 3600
+                }
+            };
+            
+            // Load sample data
+            sampleBtn.addEventListener('click', function() {
+                jsonInput.value = JSON.stringify(sampleData, null, 2);
+                topLevelName.value = "LoginResponse";
+                generateBtn.click();
+            });
+
+            // Clear input
+            clearBtn.addEventListener('click', function() {
+                jsonInput.value = '';
+                topLevelName.value = '';
+                outputCode.textContent = '';
+            });
+
+            // Download model
+            btnDownload.addEventListener('click', function() {
+                const dartCode = outputCode.textContent;
+                const blob = new Blob([dartCode], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                let className = topLevelName.value.trim() || 'Model';
+
+                let fileName = className
+                    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+                    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
+                    .toLowerCase() + '.dart';
+
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+            
+            // Generate model
+            generateBtn.addEventListener('click', function() {
+                outputCode.textContent = '';
+                if(!jsonInput.value) {
+                    alert('Please enter JSON data.');
+                    jsonInput.focus();
+                    return;
+                }else if(!topLevelName.value) {
+                    alert('Please enter class name.');
+                    topLevelName.focus();
+                    return;
+                }
+                try {
+                    const jsonData = JSON.parse(jsonInput.value);
+                    const className = topLevelName.value || 'Model';
+                    const options = {
+                        namingConvention: namingConvention.value,
+                        nullSafety: nullSafety.checked,
+                        equatable: equatable.checked,
+                        jsonSerializable: jsonSerializable.checked,
+                        finalFields: finalFields.checked,
+                        copyWith: copyWith.checked
+                    };
+                    
+                    const dartCode = generateDartModel(jsonData, className, options);
+                    outputCode.textContent = dartCode;
+                    
+                    // Re-run syntax highlighting
+                    hljs.highlightElement(outputCode);
+                } catch (error) {
+                    outputCode.textContent = `// Error: ${error.message}`;
+                    hljs.highlightElement(outputCode);
+                }
+            });
+            
+            // Copy to clipboard
+            function copyCode() {
+                const textArea = document.createElement('textarea');
+                textArea.value = outputCode.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show toast
+                toast.show();
+            }
+            
+            copyBtn.addEventListener('click', copyCode);
+            copyBtnTop.addEventListener('click', copyCode);
+            
+            // Initialize with sample data
+            jsonInput.value = JSON.stringify(sampleData, null, 2);
+            topLevelName.value = "LoginResponse";
+            
+            // Generate initial model
+            generateBtn.click();
+            
+            // Dart model generation function
+            function generateDartModel(data, className, options) {
+                try {
+                    let dartCode = '';
+                    
+                    // Add imports
+                    if (options.equatable) {
+                        dartCode += "import 'package:equatable/equatable.dart';\n";
+                    }
+                    
+                    if (options.jsonSerializable) {
+                        dartCode += "import 'package:json_annotation/json_annotation.dart';\n\n";
+                        dartCode += "part '" + className.toLowerCase() + ".g.dart';\n\n";
+                    }
+                    
+                    // Process the data and generate classes
+                    const processedClasses = new Map();
+                    const classNameSet = new Set();
+                    
+                    // Generate the main class
+                    const mainClass = generateClass(data, className, options, classNameSet);
+                    processedClasses.set(className, mainClass.code);
+                    
+                    // Process nested objects
+                    for (const [nestedClassName, nestedClassCode] of mainClass.nestedClasses) {
+                        processedClasses.set(nestedClassName, nestedClassCode);
+                    }
+                    
+                    // Add all generated classes to the output
+                    for (const [name, classCode] of processedClasses) {
+                        dartCode += classCode + '\n\n';
+                    }
+                    
+                    return dartCode;
+                } catch (error) {
+                    return `// Error generating code: ${error.message}`;
+                }
+            }
+            
+            // Generate a single class
+            function generateClass(obj, className, options, classNameSet, parentKey = '') {
+                if (!obj || typeof obj !== 'object') {
+                    return { code: `// Invalid object for class ${className}`, nestedClasses: new Map() };
+                }
+                
+                let classCode = '';
+                
+                // Add JSON serializable annotation
+                if (options.jsonSerializable) {
+                    classCode += '@JsonSerializable()\n';
+                }
+                
+                // Class declaration
+                classCode += `class ${className}${options.equatable ? ' extends Equatable' : ''} {\n`;
+                
+                // Collect fields and their types
+                const fields = [];
+                const constructorParams = [];
+                const fromJsonFields = [];
+                const toJsonFields = [];
+                const copyWithParams = [];
+                const nestedClasses = new Map();
+                
+                for (const key in obj) {
+                    if (typeof key !== 'string') continue;
+                    
+                    const value = obj[key];
+                    const typeInfo = getDartType(value, key, className, options, classNameSet, nestedClasses, parentKey);
+                    const fieldName = formatName(key, options.namingConvention);
+                    const type = typeInfo.type;
+                    
+                    // Add field declaration - don't add ? for dynamic types
+                    const nullSafetySuffix = (options.nullSafety && type !== 'dynamic') ? '?' : '';
+                    const finalKeyword = options.finalFields ? 'final ' : '';
+                    
+                    fields.push(`  ${finalKeyword}${type}${nullSafetySuffix} ${fieldName};`);
+                    
+                    // Add constructor parameter
+                    constructorParams.push(`    this.${fieldName},`);
+                    
+                    // Add fromJson mapping with proper null safety for lists and objects
+                    if (type === 'String') {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'],`);
+                    } else if (type === 'int') {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'],`);
+                    } else if (type === 'double') {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'],`);
+                    } else if (type === 'bool') {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'],`);
+                    } else if (type === 'DateTime') {
+                        fromJsonFields.push(`      ${fieldName}: DateTime.parse(json['${key}'] as String),`);
+                    } else if (type.startsWith('List<')) {
+                        const innerType = type.substring(5, type.length - 1);
+                        if (['String', 'int', 'double', 'bool'].includes(innerType)) {
+                            fromJsonFields.push(`      ${fieldName}: json['${key}'] == null ? [] : List<${innerType}>.from(json['${key}'].map((x) => x)),`);
+                        } else {
+                            fromJsonFields.push(`      ${fieldName}: json['${key}'] == null ? [] : List<${innerType}>.from(json['${key}'].map((x) => ${innerType}.fromJson(x))),`);
+                        }
+                    } else if (type.startsWith('Map<')) {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'] as Map<String, dynamic>,`);
+                    } else if (type === 'dynamic') {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'],`);
+                    } else {
+                        fromJsonFields.push(`      ${fieldName}: json['${key}'] == null ? null : ${type}.fromJson(json['${key}'] as Map<String, dynamic>),`);
+                    }
+                    
+                    // Add toJson mapping with proper null safety for lists and objects
+                    if (type === 'DateTime') {
+                        toJsonFields.push(`      '${key}': ${fieldName}?.toIso8601String(),`);
+                    } else if (type.startsWith('List<')) {
+                        const innerType = type.substring(5, type.length - 1);
+                        if (['String', 'int', 'double', 'bool'].includes(innerType)) {
+                            toJsonFields.push(`      '${key}': ${fieldName} == null ? [] : List<dynamic>.from(${fieldName}.map((x) => x)),`);
+                        } else {
+                            toJsonFields.push(`      '${key}': ${fieldName} == null ? [] : List<dynamic>.from(${fieldName}!.map((x) => x.toJson())),`);
+                        }
+                    } else if (['String', 'int', 'double', 'bool', 'dynamic'].includes(type)) {
+                        toJsonFields.push(`      '${key}': ${fieldName},`);
+                    } else if (type.startsWith('Map<')) {
+                        toJsonFields.push(`      '${key}': ${fieldName},`);
+                    } else {
+                        toJsonFields.push(`      '${key}': ${fieldName}?.toJson(),`);
+                    }
+                    
+                    // Add copyWith parameter - don't add ? for dynamic types
+                    if (options.copyWith) {
+                        const copyWithNullSafety = (options.nullSafety && type !== 'dynamic') ? '?' : '';
+                        copyWithParams.push(`    ${type}${copyWithNullSafety} ${fieldName},`);
+                    }
+                }
+                
+                // Add fields
+                if (fields.length > 0) {
+                    classCode += fields.join('\n') + '\n\n';
+                }
+                
+                // Add constructor
+                classCode += `  ${className}({\n`;
+                classCode += constructorParams.join('\n') + '\n';
+                classCode += '  });\n\n';
+                
+                // Add fromJson factory
+                classCode += `  factory ${className}.fromJson(Map<String, dynamic> json) => ${className}(\n`;
+                classCode += fromJsonFields.join('\n') + '\n';
+                classCode += '  );\n\n';
+                
+                // Add toJson method
+                classCode += '  Map<String, dynamic> toJson() => {\n';
+                classCode += toJsonFields.join('\n') + '\n';
+                classCode += '  };\n\n';
+                
+                // Add copyWith method
+                if (options.copyWith) {
+                    classCode += `  ${className} copyWith({\n`;
+                    classCode += copyWithParams.join('\n') + '\n';
+                    classCode += '  }) =>\n';
+                    classCode += `      ${className}(\n`;
+                    
+                    const copyWithAssignments = [];
+                    for (const key in obj) {
+                        const fieldName = formatName(key, options.namingConvention);
+                        copyWithAssignments.push(`        ${fieldName}: ${fieldName} ?? this.${fieldName},`);
+                    }
+                    
+                    classCode += copyWithAssignments.join('\n') + '\n';
+                    classCode += '      );\n\n';
+                }
+                
+                // Add equatable props
+                if (options.equatable) {
+                    classCode += '  @override\n';
+                    classCode += '  List<Object?> get props => [\n';
+                    
+                    const propNames = [];
+                    for (const key in obj) {
+                        const fieldName = formatName(key, options.namingConvention);
+                        propNames.push(`    ${fieldName},`);
+                    }
+                    
+                    classCode += propNames.join('\n') + '\n';
+                    classCode += '  ];\n';
+                }
+                
+                classCode += '}';
+                
+                return { code: classCode, nestedClasses };
+            }
+            
+            function getDartType(value, key, parentClassName, options, classNameSet, nestedClasses, parentKey) {
+                if (value === null) return { type: 'dynamic', isPrimitive: false };
+                
+                switch (typeof value) {
+                    case 'string':
+                        // Check if it's a date string
+                        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+                            return { type: 'DateTime', isPrimitive: false };
+                        }
+                        return { type: 'String', isPrimitive: true };
+                    case 'number':
+                        return Number.isInteger(value) ? 
+                            { type: 'int', isPrimitive: true } : 
+                            { type: 'double', isPrimitive: true };
+                    case 'boolean':
+                        return { type: 'bool', isPrimitive: true };
+                    case 'object':
+                        if (Array.isArray(value)) {
+                            if (value.length === 0) return { type: 'List<dynamic>', isPrimitive: false };
+                            const elementTypeInfo = getDartType(value[0], key, parentClassName, options, classNameSet, nestedClasses, parentKey);
+                            return { type: `List<${elementTypeInfo.type}>`, isPrimitive: false };
+                        } else {
+                            // For nested objects, create a class name based on the key only (not parent)
+                            const nestedClassName = formatName(key, 'pascal');
+                            
+                            // Only generate if we haven't already
+                            if (!classNameSet.has(nestedClassName)) {
+                                classNameSet.add(nestedClassName);
+                                const nestedClass = generateClass(value, nestedClassName, options, classNameSet, key);
+                                nestedClasses.set(nestedClassName, nestedClass.code);
+                                
+                                // Add any nested classes from this nested class
+                                for (const [name, code] of nestedClass.nestedClasses) {
+                                    nestedClasses.set(name, code);
+                                }
+                            }
+                            
+                            return { type: nestedClassName, isPrimitive: false };
+                        }
+                    default:
+                        return { type: 'dynamic', isPrimitive: false };
+                }
+            }
+            
+            function formatName(name, convention) {
+                if (!name || typeof name !== 'string') {
+                    return 'unknown';
+                }
+                
+                // Handle snake_case to camelCase conversion for field names like "expires_in"
+                if (name.includes('_')) {
+                    name = name.replace(/_([a-z])/g, (match, p1) => p1.toUpperCase());
+                }
+                
+                // Remove any non-alphanumeric characters and clean up
+                let cleanName = name.replace(/[^a-zA-Z0-9_]/g, ' ');
+                
+                // If the name is empty after cleaning, use a default
+                if (!cleanName.trim()) {
+                    cleanName = 'field';
+                }
+                
+                // Ensure it doesn't start with a number
+                if (/^[0-9]/.test(cleanName)) {
+                    cleanName = `_${cleanName}`;
+                }
+                
+                switch (convention) {
+                    case 'pascal':
+                        return toPascalCase(cleanName);
+                    case 'camel':
+                        return toCamelCase(cleanName);
+                    case 'snake':
+                        return toSnakeCase(cleanName);
+                    default:
+                        return toCamelCase(cleanName);
+                }
+            }
+            
+            function toCamelCase(str) {
+                if (!str || typeof str !== 'string') return 'unknown';
+                return str
+                    .split(' ')
+                    .filter(part => part.length > 0)
+                    .map((word, index) => {
+                        if (index === 0) {
+                            return word.toLowerCase();
+                        }
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    })
+                    .join('');
+            }
+            
+            function toPascalCase(str) {
+                if (!str || typeof str !== 'string') return 'Unknown';
+                return str
+                    .split(' ')
+                    .filter(part => part.length > 0)
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join('');
+            }
+            
+            function toSnakeCase(str) {
+                if (!str || typeof str !== 'string') return 'unknown';
+                return str
+                    .split(' ')
+                    .filter(part => part.length > 0)
+                    .map(word => word.toLowerCase())
+                    .join('_');
+            }
+        });
+    </script>
+</body>
+</html>
